@@ -1,74 +1,108 @@
-import React, { useState } from 'react';
+import { React, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useLoginMutation } from '../../store/auth/authApi.js'
+import { useDispatch, useSelector } from 'react-redux'
+import { setCredentials } from '../../store/auth/authSlice.js'
 
-export default function Auth({ onLoginSuccess }) {
-  const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({ username: '', email: '', password: '' });
+const LoginPage = () => {
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+  const [loginTrigger, { isLoading }] = useLoginMutation()
+  const { isAuthenticated } = useSelector((store) => store.auth)
+  console.log(isAuthenticated)
+  const dispatch = useDispatch()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm()
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isLogin) {
-      // POST /auth/login
-      console.log('Вход:', { username: formData.username, password: formData.password });
-    } else {
-      // POST /users/register
-      console.log('Регистрация:', formData);
+  const handleLogin = async (data) => {
+    setError('')
+    setLoading(true)
+
+    try {
+      const result = await loginTrigger(data).unwrap()
+      dispatch(setCredentials(result))
+    } catch (err) {
+      setError('Неверный логин или пароль')
+    } finally {
+      setLoading(false)
     }
-    onLoginSuccess();
-  };
+  }
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/')
+    }
+  }, [isAuthenticated])
+
+  if (isAuthenticated) return null
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg border border-slate-100">
-        <h2 className="text-center text-3xl font-extrabold text-slate-900">
-          {isLogin ? 'Войти в аккаунт' : 'Регистрация'}
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 border border-slate-100">
+        <h2 className="text-3xl font-bold text-center text-slate-800 mb-2">
+          С возвращением
         </h2>
-        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-          {!isLogin && (
-            <div>
-              <label className="block text-sm font-medium text-slate-700">Email</label>
-              <input
-                type="email"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-              />
-            </div>
-          )}
+        <p className="text-center text-slate-500 mb-6 text-sm">
+          Войдите в свой аккаунт для управления новостями
+        </p>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit(handleLogin)} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700">Имя пользователя</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Email
+            </label>
             <input
-              type="text"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              value={formData.username}
-              onChange={(e) => setFormData({...formData, username: e.target.value})}
+              type="email"
+              {...register('email', { required: true })}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+              placeholder="you@example.com"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-slate-700">Пароль</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Пароль
+            </label>
             <input
               type="password"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              {...register('password', { required: true })}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+              placeholder="••••••••"
             />
           </div>
+
           <button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+            disabled={loading}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors disabled:opacity-50"
           >
-            {isLogin ? 'Войти' : 'Создать аккаунт'}
+            {loading ? 'Вход...' : 'Войти'}
           </button>
         </form>
-        <button
-          onClick={() => setIsLogin(!isLogin)}
-          className="w-full text-center text-sm text-blue-600 hover:underline mt-4"
-        >
-          {isLogin ? 'Еще нет аккаунта? Зарегистрироваться' : 'Уже есть аккаунт? Войти'}
-        </button>
+
+        <p className="text-center text-sm text-slate-600 mt-6">
+          Ещё нет аккаунта?{' '}
+          <Link
+            to="/register"
+            className="text-emerald-600 hover:underline font-medium"
+          >
+            Зарегистрироваться
+          </Link>
+        </p>
       </div>
     </div>
-  );
+  )
 }
+
+export default LoginPage
