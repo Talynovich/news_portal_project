@@ -8,12 +8,14 @@ import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { News } from './entities/news.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, ILike, Repository } from 'typeorm';
+import { FindManyOptions, In, Repository } from 'typeorm';
+import { SearchService } from '../search/search.service';
 
 @Injectable()
 export class NewsService {
   constructor(
     @InjectRepository(News) private newsRepository: Repository<News>,
+    private readonly searchService: SearchService,
   ) {}
 
   create(userId: number, dto: CreateNewsDto) {
@@ -28,10 +30,35 @@ export class NewsService {
     page: number = 1,
     limit: number = 10,
     search?: string,
-  ): Promise<{
-    data: News[];
-    total: number;
-  }> {
+  ): Promise<{ data: News[]; total: number }> {
+    if (page <= 0) {
+      throw new BadRequestException(
+        `The page parameter cannot be less than or equal to 0`,
+      );
+    }
+
+    if (search && search.trim() !== '') {
+      const formattedQuery = search.trim();
+
+      const { ids, total } = await this.searchService.searchNews(
+        formattedQuery,
+        page,
+        limit,
+      );
+
+      if (ids.length === 0) {
+        return { data: [], total: 0 };
+      }
+      const data = await this.newsRepository.find({
+        where: { id: In(ids) },
+        relations: ['author'],
+        order: {
+          createdAt: 'DESC',
+        },
+      });
+
+      return { data, total };
+    }
     const options: FindManyOptions<News> = {
       relations: ['author'],
       order: {
@@ -41,24 +68,8 @@ export class NewsService {
       skip: (page - 1) * limit,
     };
 
-    if (page == 0) {
-      throw new BadRequestException(`The limit parameter cannot be equal to 0`);
-    }
-
-    if (search && search.trim() !== '') {
-      const formattedQuery = search.trim();
-      options.where = [
-        { title: ILike(`%${formattedQuery}%`) },
-        { description: ILike(`%${formattedQuery}%`) },
-      ];
-    }
-
     const [data, total] = await this.newsRepository.findAndCount(options);
-
-    return {
-      data,
-      total,
-    };
+    return { data, total };
   }
 
   async findOne(id: number) {

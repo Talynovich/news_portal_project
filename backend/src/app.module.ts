@@ -8,6 +8,7 @@ import { Users } from './users/entities/user.entity';
 import { CommentsModule } from './comments/comments.module';
 import { Comment } from './comments/entities/comment.entity';
 import { UploadModule } from './upload/upload.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { UploadModule } from './upload/upload.module';
     NewsModule,
     CommentsModule,
     UploadModule,
+    SearchModule,
   ],
 })
 export class AppModule {}

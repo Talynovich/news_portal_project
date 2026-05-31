@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { logout } from '../../store/auth/authSlice.js'
+import { useGetNewsQuery } from '../../store/news/newsApi.js'
+import NewsCard from '../../component/newsCard/index.js'
 
 const HomePage = () => {
-  const [newsList, setNewsList] = useState([])
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const { isAuthenticated } = useSelector((store) => store.auth)
+  const dispatch = useDispatch()
+  const {  data, isLoading, error } = useGetNewsQuery()
 
-  const isAuth = !!localStorage.getItem('token')
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    navigate('/login')
+    dispatch(logout())
   }
 
-  if (isAuthenticated) {
-    navigate('/login')
-  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
@@ -32,7 +31,7 @@ const HomePage = () => {
           </Link>
 
           <div className="flex items-center gap-4">
-            {isAuth ? (
+            {isAuthenticated ? (
               <>
                 <Link
                   to="/create-news"
@@ -42,7 +41,7 @@ const HomePage = () => {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="text-slate-500 hover:text-red-600 text-sm font-medium transition-colors py-2 px-1"
+                  className="cursor-pointer text-slate-500 hover:text-red-600 text-sm font-medium transition-colors py-2 px-1"
                 >
                   Выйти
                 </button>
@@ -66,7 +65,7 @@ const HomePage = () => {
             Лента новостей
           </h1>
           <span className="text-xs font-semibold bg-slate-200 text-slate-700 px-2.5 py-1 rounded-md">
-            Всего: {newsList.length}
+            Всего: {data?.data.length}
           </span>
         </div>
 
@@ -78,7 +77,7 @@ const HomePage = () => {
               Загрузка свежих событий...
             </p>
           </div>
-        ) : newsList.length === 0 ? (
+        ) : data?.data === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-200 p-8">
             <p className="text-slate-500 font-medium mb-2">Здесь пока пусто</p>
             <p className="text-xs text-slate-400">
@@ -88,17 +87,16 @@ const HomePage = () => {
         ) : (
           /* Список карточек */
           <div className="space-y-5">
-            {/*{newsList.map((news) => (*/}
-            {/*  <NewsCard*/}
-            {/*    key={news.id || news._id}*/}
-            {/*    id={news.id || news._id}*/}
-            {/*    title={news.title}*/}
-            {/*    content={news.content}*/}
-            {/*    imageUrl={news.imageUrl}*/}
-            {/*    createdAt={news.createdAt}*/}
-            {/*    comments={news.comments} // Прокидываем комментарии (или их каунт) в карточку*/}
-            {/*  />*/}
-            {/*))}*/}
+            {data?.data.map((news) => (
+              <NewsCard
+                key={news.id || news._id}
+                id={news.id || news._id}
+                title={news.title}
+                content={news.content}
+                createdAt={news.createdAt}
+                comments={news.comments}
+              />
+            ))}
           </div>
         )}
       </main>

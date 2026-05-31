@@ -12,13 +12,14 @@ const LoginPage = () => {
   const navigate = useNavigate()
   const [loginTrigger, { isLoading }] = useLoginMutation()
   const { isAuthenticated } = useSelector((store) => store.auth)
-  console.log(isAuthenticated)
   const dispatch = useDispatch()
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm()
+  } = useForm({
+    defaultValues: { email: 'user@test.ru', password: 'user1234' },
+  })
 
   const handleLogin = async (data) => {
     setError('')
@@ -85,7 +86,7 @@ const LoginPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors disabled:opacity-50"
+            className="cursor-pointer w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors disabled:opacity-50"
           >
             {loading ? 'Вход...' : 'Войти'}
           </button>

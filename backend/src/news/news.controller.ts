@@ -16,7 +16,6 @@ import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import type { RequestWithUser } from '../auth/interfaces/request-with-user.interfaces';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 
 @Controller('news')
@@ -30,8 +29,6 @@ export class NewsController {
     return this.newsService.create(+req.user.sub, news);
   }
 
-  @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard)
   @ApiQuery({ name: 'search', required: false, type: String })
   @Get()
   findAll(
