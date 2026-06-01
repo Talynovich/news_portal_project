@@ -18,12 +18,23 @@ export class NewsService {
     private readonly searchService: SearchService,
   ) {}
 
-  create(userId: number, dto: CreateNewsDto) {
+  async create(userId: number, dto: CreateNewsDto) {
     const news = this.newsRepository.create({
       ...dto,
       author: { id: userId },
     });
-    return this.newsRepository.save(news);
+    const savedNews = await this.newsRepository.save(news);
+    try {
+      await this.searchService.indexNews({
+        id: savedNews.id,
+        title: savedNews.title,
+        description: savedNews.description,
+      });
+    } catch (error) {
+      console.error('Failed to index the news item in Elastic:', error);
+    }
+
+    return savedNews;
   }
 
   async findAll(

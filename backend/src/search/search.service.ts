@@ -29,4 +29,15 @@ export class SearchService {
 
     return { ids, total };
   }
+  async indexNews(news: { id: number; title: string; description: string }) {
+    return this.elasticsearchService.index({
+      index: 'news',
+      id: news.id.toString(),
+      document: {
+        id: news.id,
+        title: news.title,
+        description: news.description,
+      },
+    });
+  }
 }

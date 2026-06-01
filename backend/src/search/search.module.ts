@@ -7,9 +7,7 @@ import { SearchService } from './search.service';
     ElasticsearchModule.register({
       node: 'https://my-elasticsearch-project-ed577b.es.us-central1.gcp.elastic.cloud:443',
       auth: {
-        username: 'elastic',
-        password:
-          'LU9DLWZKNEJiSzlyWnFKWC1FcTY6ZHJSRUR5WDFUMHVPOTU3Mk5FQXNSZw==',
+        apiKey: 'LU9DLWZKNEJiSzlyWnFKWC1FcTY6ZHJSRUR5WDFUMHVPOTU3Mk5FQXNSZw==',
       },
     }),
   ],
