@@ -9,6 +9,7 @@ import { CommentsModule } from './comments/comments.module';
 import { Comment } from './comments/entities/comment.entity';
 import { UploadModule } from './upload/upload.module';
 import { SearchModule } from './search/search.module';
+import { Image } from './upload/entities/image.entity';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { SearchModule } from './search/search.module';
       username: 'postgres',
       password: 'admin123',
       database: 'ny_times',
-      entities: [Users, News, Comment],
+      entities: [Users, News, Comment, Image],
       autoLoadEntities: true,
       synchronize: false,
     }),

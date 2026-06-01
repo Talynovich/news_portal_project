@@ -7,8 +7,9 @@ import {
 import { CreateNewsDto } from './dto/create-news.dto';
 import { UpdateNewsDto } from './dto/update-news.dto';
 import { News } from './entities/news.entity';
+import { Image } from '../upload/entities/image.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, In, Repository } from 'typeorm';
+import { FindManyOptions, In, Repository, DataSource } from 'typeorm';
 import { SearchService } from '../search/search.service';
 
 @Injectable()
@@ -16,14 +17,35 @@ export class NewsService {
   constructor(
     @InjectRepository(News) private newsRepository: Repository<News>,
     private readonly searchService: SearchService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(userId: number, dto: CreateNewsDto) {
-    const news = this.newsRepository.create({
-      ...dto,
-      author: { id: userId },
+    const savedNews = await this.dataSource.transaction(async (manager) => {
+      if (dto.imageId) {
+        const image = await manager.findOne(Image, {
+          where: { id: dto.imageId },
+        });
+
+        if (!image) {
+          throw new NotFoundException(`Image with ID ${dto.imageId} not found`);
+        }
+
+        if (image.assigned) {
+          throw new BadRequestException(
+            'This image is already linked to another news item',
+          );
+        }
+        image.assigned = true;
+        await manager.save(Image, image);
+      }
+      const news = manager.create(News, {
+        ...dto,
+        author: { id: userId },
+        imageId: dto.imageId ?? undefined,
+      });
+      return await manager.save(News, news);
     });
-    const savedNews = await this.newsRepository.save(news);
     try {
       await this.searchService.indexNews({
         id: savedNews.id,

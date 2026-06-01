@@ -1,8 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Image } from './entities/image.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UploadService {
+  constructor(
+    @InjectRepository(Image)
+    private readonly imageRepository: Repository<Image>,
+  ) {}
   private s3 = new S3Client({
     region: 'us-east-1',
 
@@ -16,6 +23,7 @@ export class UploadService {
 
   async upload(file: Express.Multer.File) {
     const key = Date.now() + '-' + file.originalname;
+    const url = ` http://147.45.98.194:9000/newsportal/${key}`;
 
     await this.s3.send(
       new PutObjectCommand({
@@ -26,9 +34,15 @@ export class UploadService {
       }),
     );
 
+    const newImage = this.imageRepository.create({
+      url: url,
+      s3key: key,
+    });
+    const savedImage = await this.imageRepository.save(newImage);
+
     return {
-      key,
-      url: ` http://147.45.98.194:9000/newsportal/${key}`,
+      id: savedImage.id,
+      url: savedImage.url,
     };
   }
 }
