@@ -1,4 +1,3 @@
-// search.service.ts
 import { Injectable } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 
@@ -11,13 +10,13 @@ export class SearchService {
 
     const result = await this.elasticsearchService.search({
       index: 'news',
-      from: from, // Смещение (аналог skip)
-      size: limit, // Количество (аналог take)
+      from: from,
+      size: limit,
       query: {
         multi_match: {
           query: text,
-          fields: ['title', 'description'], // Ищем по заголовку и описанию
-          fuzziness: 'AUTO', // Бонус: включит поиск с опечатками!
+          fields: ['title', 'description'],
+          fuzziness: 'AUTO',
         },
       },
     });
@@ -26,8 +25,6 @@ export class SearchService {
       typeof result.hits.total === 'number'
         ? result.hits.total
         : result.hits.total?.value || 0;
-
-    // Извлекаем только ID найденных документов
     const ids = result.hits.hits.map((hit) => Number(hit._id));
 
     return { ids, total };
