@@ -4,12 +4,32 @@ export const usersApi = createApi({
   reducerPath: 'usersApi',
   baseQuery: fetchBaseQuery({
     baseUrl: `${baseurl}`,
+    tagTypes: ['Users'],
+    prepareHeaders: (headers, { getState }) => {
+      const token = getState().auth.access_token
+      if (token) {
+        try {
+          headers.set('authorization', `Bearer ${token}`)
+        } catch (e) {
+          console.log(`Критическая ошибка в токене авторизации: ${e}`)
+        }
+      }
+      return headers
+    },
   }),
   endpoints: (build) => ({
     getUser: build.query({
       query: () => ({
         url: '/me',
       }),
+      providesTags: ['Users'],
+    }),
+    deleteUser: build.mutation({
+      query: (id) => ({
+        url: `/users/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Users'],
     }),
     register: build.mutation({
       query: (credential) => ({
@@ -17,12 +37,18 @@ export const usersApi = createApi({
         method: 'POST',
         body: credential,
       }),
-      getUser: build.query({
-        query: () => ({
-          url: '/me',
-        }),
+      invalidatesTags: ['Users'],
+    }),
+    getAllUsers: build.query({
+      query: () => ({
+        url: '/users/all',
       }),
+      providesTags: ['Users'],
     }),
   }),
 })
-export const { useRegisterMutation } = usersApi
+export const {
+  useRegisterMutation,
+  useGetAllUsersQuery,
+  useDeleteUserMutation,
+} = usersApi

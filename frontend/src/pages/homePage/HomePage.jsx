@@ -4,72 +4,37 @@ import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../../store/auth/authSlice.js'
 import { useGetNewsQuery } from '../../store/news/newsApi.js'
 import NewsCard from '../../newsCard/index.js'
-import {setCredentialsNews} from "../../store/news/newsSlice.js";
+import { setCredentialsNews } from '../../store/news/newsSlice.js'
+import Header from '../../component/header'
 
 const HomePage = () => {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const { isAuthenticated } = useSelector((store) => store.auth)
   const dispatch = useDispatch()
-  const {  data, isLoading, error } = useGetNewsQuery()
-const NewsData = () => {
-  const dispatch = useDispatch()
-  const {  data, isLoading, error } = useGetNewsQuery()
-}
+  const { data, isLoading, error } = useGetNewsQuery()
+  const NewsData = () => {
+    const dispatch = useDispatch()
+    const { data, isLoading, error } = useGetNewsQuery()
+  }
 
   useEffect(() => {
     if (data) {
       dispatch(setCredentialsNews(data.data))
     }
-  }, [data,dispatch]);
+  }, [data, dispatch])
 
   const handleLogout = () => {
     dispatch(logout())
   }
 
-  if (!isAuthenticated){
+  if (!isAuthenticated) {
     navigate('/login')
   }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link
-            to="/"
-            className="text-xl font-extrabold text-emerald-600 tracking-tight hover:opacity-90"
-          >
-            📰 NEWS<span className="text-slate-800">PORTAL</span>
-          </Link>
-
-          <div className="flex items-center gap-4">
-            {isAuthenticated ? (
-              <>
-                <Link
-                  to="/create-news"
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-sm shadow-emerald-100"
-                >
-                  + Создать публикацию
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="cursor-pointer text-slate-500 hover:text-red-600 text-sm font-medium transition-colors py-2 px-1"
-                >
-                  Выйти
-                </button>
-              </>
-            ) : (
-              <Link
-                to="/login"
-                className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2 rounded-xl text-sm font-medium transition-colors"
-              >
-                Войти
-              </Link>
-            )}
-          </div>
-        </div>
-      </header>
-
+      <Header isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
       <main className="max-w-4xl mx-auto px-4 py-10">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">
@@ -96,7 +61,7 @@ const NewsData = () => {
         ) : (
           <div className="space-y-5">
             {data?.data.map((news) => {
-              return(
+              return (
                 <NewsCard
                   key={news.id || news._id}
                   id={news.id || news._id}

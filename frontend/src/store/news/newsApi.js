@@ -21,19 +21,7 @@ export const newsApi = createApi({
       query: (id) => ({ url: `/${id}`, method: 'DELETE' }),
       invalidatesTags: ['News'],
     }),
-    savePatient: build.mutation({
-      query: (data) => ({
-        url: data.id ? `/${data.id}` : '/',
-        method: data.id ? 'PUT' : 'POST',
-        body: data,
-      }),
-      invalidatesTags: ['News'],
-    }),
   }),
 })
 
-export const {
-  useGetNewsQuery,
-  useGetDetailNewsQuery,
-  useSavePatientMutation,
-} = newsApi
+export const { useGetNewsQuery, useGetDetailNewsQuery } = newsApi
