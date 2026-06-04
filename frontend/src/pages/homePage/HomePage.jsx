@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../../store/auth/authSlice.js'
 import { useGetNewsQuery } from '../../store/news/newsApi.js'
-import NewsCard from '../../component/newsCard/index.js'
+import NewsCard from '../../newsCard/index.js'
+import {setCredentialsNews} from "../../store/news/newsSlice.js";
 
 const HomePage = () => {
   const [loading, setLoading] = useState(false)
@@ -11,16 +12,27 @@ const HomePage = () => {
   const { isAuthenticated } = useSelector((store) => store.auth)
   const dispatch = useDispatch()
   const {  data, isLoading, error } = useGetNewsQuery()
+const NewsData = () => {
+  const dispatch = useDispatch()
+  const {  data, isLoading, error } = useGetNewsQuery()
+}
 
+  useEffect(() => {
+    if (data) {
+      dispatch(setCredentialsNews(data.data))
+    }
+  }, [data,dispatch]);
 
   const handleLogout = () => {
     dispatch(logout())
   }
 
+  if (!isAuthenticated){
+    navigate('/login')
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-      {/* Шапка портала */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link
@@ -58,7 +70,6 @@ const HomePage = () => {
         </div>
       </header>
 
-      {/* Основная лента */}
       <main className="max-w-4xl mx-auto px-4 py-10">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">
@@ -68,8 +79,6 @@ const HomePage = () => {
             Всего: {data?.data.length}
           </span>
         </div>
-
-        {/* Индикатор загрузки */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-3">
             <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-b-emerald-600"></div>
@@ -85,18 +94,20 @@ const HomePage = () => {
             </p>
           </div>
         ) : (
-          /* Список карточек */
           <div className="space-y-5">
-            {data?.data.map((news) => (
-              <NewsCard
-                key={news.id || news._id}
-                id={news.id || news._id}
-                title={news.title}
-                content={news.content}
-                createdAt={news.createdAt}
-                comments={news.comments}
-              />
-            ))}
+            {data?.data.map((news) => {
+              return(
+                <NewsCard
+                  key={news.id || news._id}
+                  id={news.id || news._id}
+                  title={news.title}
+                  description={news.description}
+                  createdAt={news.createdAt}
+                  comments={news.comments}
+                  author={news.author}
+                />
+              )
+            })}
           </div>
         )}
       </main>

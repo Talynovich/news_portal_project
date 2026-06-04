@@ -6,9 +6,14 @@ const newsSlice = createSlice({
     news: [],
     isLoading: true,
   },
-  reducers: {},
+  reducers: {
+    setCredentialsNews: (state, action) => {
+      state.news = action.payload
+      state.isLoading = false
+},
+  },
   }
 )
 
-export const {  } = newsSlice.actions
+export const { setCredentialsNews } = newsSlice.actions
 export default newsSlice.reducer

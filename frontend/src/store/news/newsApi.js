@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { baseurl } from '../../contant/contant.js'
 
 export const newsApi = createApi({
-  reducerPath: 'news',
+  reducerPath: 'newsApi',
   baseQuery: fetchBaseQuery({
     baseUrl: `${baseurl}`,
   }),
@@ -13,7 +13,11 @@ export const newsApi = createApi({
       query: () => '/news',
       providesTags: ['News'],
     }),
-    deletePatient: build.mutation({
+    getDetailNews: build.query({
+      query: (id) => `/news/${id}`,
+      providesTags: ['News'],
+    }),
+    deleteNews: build.mutation({
       query: (id) => ({ url: `/${id}`, method: 'DELETE' }),
       invalidatesTags: ['News'],
     }),
@@ -30,6 +34,6 @@ export const newsApi = createApi({
 
 export const {
   useGetNewsQuery,
-  useDeletePatientMutation,
+  useGetDetailNewsQuery,
   useSavePatientMutation,
 } = newsApi

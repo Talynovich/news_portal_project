@@ -39,8 +39,6 @@ export class NewsController {
     return this.newsService.findAll(page, limit, search);
   }
 
-  @ApiBearerAuth('JWT-auth')
-  @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.newsService.findOne(+id);
