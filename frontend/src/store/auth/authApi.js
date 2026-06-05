@@ -50,12 +50,19 @@ export const authApi = createApi({
   endpoints: (build) => ({
     login: build.mutation({
       query: (credential) => ({
-        url: '',
+        url: '/login',
         method: 'POST',
         body: credential,
+      }),
+    }),
+    refresh: build.mutation({
+      query: (credential) => ({
+        url: '/refresh',
+        method: 'POST',
+        body: { refresh_token: credential },
       }),
     }),
   }),
 })
 
-export const { useLoginMutation } = authApi
+export const { useLoginMutation, useRefreshMutation } = authApi

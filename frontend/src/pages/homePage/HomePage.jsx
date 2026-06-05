@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
-import { logout } from '../../store/auth/authSlice.js'
+import { logout, setCredentials } from '../../store/auth/authSlice.js'
 import { useGetNewsQuery } from '../../store/news/newsApi.js'
 import NewsCard from '../../newsCard/index.js'
 import { setCredentialsNews } from '../../store/news/newsSlice.js'
 import Header from '../../component/header'
+import { useRefreshMutation } from '../../store/auth/authApi.js'
 
 const HomePage = () => {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
-  const { isAuthenticated } = useSelector((store) => store.auth)
+  const [refresh] = useRefreshMutation()
+  const { isAuthenticated, refresh_token } = useSelector((store) => store.auth)
   const dispatch = useDispatch()
   const { data, isLoading, error } = useGetNewsQuery()
   const NewsData = () => {
@@ -28,9 +30,26 @@ const HomePage = () => {
     dispatch(logout())
   }
 
-  if (!isAuthenticated) {
-    navigate('/login')
-  }
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login')
+    }
+  }, [isAuthenticated])
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      if (refresh_token) {
+        try {
+          const result = await refresh(refresh_token).unwrap()
+          dispatch(setCredentials(result))
+        } catch (error) {
+          console.error('Не удалось обновить токен при старте:', error)
+          dispatch(logout())
+        }
+      }
+    }
+    initializeAuth()
+  }, [refresh_token])
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
