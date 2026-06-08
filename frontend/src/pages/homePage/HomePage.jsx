@@ -7,6 +7,7 @@ import NewsCard from '../../newsCard/index.js'
 import { setCredentialsNews } from '../../store/news/newsSlice.js'
 import Header from '../../component/header'
 import { useRefreshMutation } from '../../store/auth/authApi.js'
+import { Pagination } from 'antd'
 
 const HomePage = () => {
   const [loading, setLoading] = useState(false)
@@ -14,11 +15,18 @@ const HomePage = () => {
   const [refresh] = useRefreshMutation()
   const { isAuthenticated, refresh_token } = useSelector((store) => store.auth)
   const dispatch = useDispatch()
-  const { data, isLoading, error } = useGetNewsQuery()
   const NewsData = () => {
     const dispatch = useDispatch()
     const { data, isLoading, error } = useGetNewsQuery()
   }
+  const [correntPage, setCorrentPage] = useState(1)
+  const handlePageChange = (e) => {
+    setCorrentPage(e)
+  }
+  const { data, isLoading, error, total } = useGetNewsQuery({
+    correntPage,
+    limit: 5,
+  })
 
   useEffect(() => {
     if (data) {
@@ -80,12 +88,14 @@ const HomePage = () => {
         ) : (
           <div className="space-y-5">
             {data?.data.map((news) => {
+              console.log(news, 'news')
               return (
                 <NewsCard
                   key={news.id || news._id}
                   id={news.id || news._id}
                   title={news.title}
                   description={news.description}
+                  imageUrl={news.image ? news.image.url : null}
                   createdAt={news.createdAt}
                   comments={news.comments}
                   author={news.author}
@@ -94,6 +104,16 @@ const HomePage = () => {
             })}
           </div>
         )}
+        <div className="mt-3">
+          <Pagination
+            align="end"
+            current={correntPage}
+            pageSize={5}
+            total={data?.total}
+            onChange={handlePageChange}
+            showSizeChanger={false}
+          />
+        </div>
       </main>
     </div>
   )

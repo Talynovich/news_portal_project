@@ -10,7 +10,11 @@ export const newsApi = createApi({
   tagTypes: ['News'],
   endpoints: (build) => ({
     getNews: build.query({
-      query: () => '/news',
+      query: ({ correntPage, limit = 5 }) => ({
+        url: '/news',
+        method: 'GET',
+        params: { page: correntPage, limit },
+      }),
       providesTags: ['News'],
     }),
     getDetailNews: build.query({

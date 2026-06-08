@@ -24,12 +24,12 @@ export class News {
   description: string;
 
   @Column({ nullable: true })
-  imageId: number;
+  imageUrl: number;
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToOne(() => Image, { nullable: true, onDelete: 'SET NULL' })
+  @OneToOne(() => Image, { nullable: true, onDelete: 'SET NULL', eager: true })
   @JoinColumn({ name: 'imageId' })
   image: Image;
 
