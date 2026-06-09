@@ -10,15 +10,12 @@ import { useRefreshMutation } from '../../store/auth/authApi.js'
 import { Pagination } from 'antd'
 
 const HomePage = () => {
-  const [loading, setLoading] = useState(false)
+  const [loading] = useState(false)
   const navigate = useNavigate()
   const [refresh] = useRefreshMutation()
   const { isAuthenticated, refresh_token } = useSelector((store) => store.auth)
   const dispatch = useDispatch()
-  const NewsData = () => {
-    const dispatch = useDispatch()
-    const { data, isLoading, error } = useGetNewsQuery()
-  }
+  const NewsData = () => {}
   const [correntPage, setCorrentPage] = useState(1)
   const handlePageChange = (e) => {
     setCorrentPage(e)
@@ -51,13 +48,13 @@ const HomePage = () => {
           const result = await refresh(refresh_token).unwrap()
           dispatch(setCredentials(result))
         } catch (error) {
-          console.error('Не удалось обновить токен при старте:', error)
+          console.error('Error:', error)
           dispatch(logout())
         }
       }
     }
     initializeAuth()
-  }, [refresh_token])
+  }, [])
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
@@ -68,10 +65,10 @@ const HomePage = () => {
             Лента новостей
           </h1>
           <span className="text-xs font-semibold bg-slate-200 text-slate-700 px-2.5 py-1 rounded-md">
-            Всего: {data?.data.length}
+            Всего: {data?.total}
           </span>
         </div>
-        {loading ? (
+        {isLoading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-3">
             <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-b-emerald-600"></div>
             <p className="text-sm text-slate-400 font-medium">
@@ -88,7 +85,6 @@ const HomePage = () => {
         ) : (
           <div className="space-y-5">
             {data?.data.map((news) => {
-              console.log(news, 'news')
               return (
                 <NewsCard
                   key={news.id || news._id}

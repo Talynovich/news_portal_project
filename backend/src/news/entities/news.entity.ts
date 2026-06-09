@@ -1,5 +1,7 @@
 import {
+  AfterInsert,
   AfterLoad,
+  AfterUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -25,14 +27,14 @@ export class News {
   description: string;
 
   @Column({ nullable: true })
-  imageUrl: number | string;
+  imageUrl: string | null;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @OneToOne(() => Image, { nullable: true, onDelete: 'SET NULL', eager: true })
   @JoinColumn({ name: 'imageUrl' })
-  image: Image;
+  image: Image | null;
 
   @ManyToOne(() => Users, (user) => user.news, { onDelete: 'SET NULL' })
   author: Users;

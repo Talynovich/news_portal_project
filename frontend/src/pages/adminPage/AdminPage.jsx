@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Input, Table, Tag, Button } from 'antd'
 import { SearchOutlined, DeleteOutlined } from '@ant-design/icons'
 import {
@@ -9,14 +9,13 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 const AdminPage = () => {
   const [searchText, setSearchText] = useState('')
-  const [deleteUser, { error }] = useDeleteUserMutation()
+  const [deleteUser] = useDeleteUserMutation()
   const { data: users = [], isLoading } = useGetAllUsersQuery()
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const handleDelete = (target) => {
     dispatch(deleteUser(target.id))
   }
-  console.log(error)
 
   const filteredData = users.filter(
     (user) =>
@@ -44,14 +43,12 @@ const AdminPage = () => {
       key: 'role',
       filters: [
         { text: 'User', value: 'User' },
-        { text: 'Doctor', value: 'Doctor' },
         { text: 'Admin', value: 'Admin' },
       ],
       onFilter: (value, record) => record.role === value,
       render: (role) => {
         let color = 'default'
-        if (role === 'Admin') color = 'gold'
-        if (role === 'Doctor') color = 'blue'
+        if (role === 'admin') color = 'gold'
         return (
           <Tag color={color} className="rounded px-2 py-0.5 font-medium">
             {role}
@@ -67,7 +64,7 @@ const AdminPage = () => {
         <Button
           type="text"
           danger
-          disabled={record.role === 'Admin'} // Нельзя удалить админа
+          disabled={record.role === 'admin'} // Нельзя удалить админа
           icon={<DeleteOutlined />}
           onClick={() => handleDelete(record)}
           className="hover:bg-rose-50 rounded-lg transition-colors"
@@ -79,7 +76,6 @@ const AdminPage = () => {
   ]
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 text-[#1E293B]">
-      {/* Заголовок и счётчик в стиле News Portal */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <button
           onClick={() => navigate('/')}
@@ -110,8 +106,6 @@ const AdminPage = () => {
           allowClear
         />
       </div>
-
-      {/* Сама таблица Antd */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden p-2">
         <Table
           columns={columns}

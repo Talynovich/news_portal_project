@@ -1,37 +1,25 @@
 import { React, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useLoginMutation } from '../../store/auth/authApi.js'
 import { useDispatch, useSelector } from 'react-redux'
 import { setCredentials } from '../../store/auth/authSlice.js'
 
 const LoginPage = () => {
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
-  const [loginTrigger, { isLoading }] = useLoginMutation()
+  const [loginTrigger, { isLoading, error }] = useLoginMutation()
   const { isAuthenticated } = useSelector((store) => store.auth)
   const dispatch = useDispatch()
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+  const { register, handleSubmit } = useForm({
     defaultValues: { email: 'user@test.ru', password: 'user1234' },
   })
 
   const handleLogin = async (data) => {
-    setError('')
-    setLoading(true)
-
     try {
       const result = await loginTrigger(data).unwrap()
       dispatch(setCredentials(result))
     } catch (err) {
-      setError('Неверный логин или пароль')
-    } finally {
-      setLoading(false)
+      console.log(err)
     }
   }
 
@@ -45,9 +33,6 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 border border-slate-100">
-        <h2 className="text-3xl font-bold text-center text-slate-800 mb-2">
-          С возвращением
-        </h2>
         <p className="text-center text-slate-500 mb-6 text-sm">
           Войдите в свой аккаунт для управления новостями
         </p>
@@ -85,10 +70,10 @@ const LoginPage = () => {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={isLoading}
             className="cursor-pointer w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg transition-colors disabled:opacity-50"
           >
-            {loading ? 'Вход...' : 'Войти'}
+            {isLoading ? 'Вход...' : 'Войти'}
           </button>
         </form>
 

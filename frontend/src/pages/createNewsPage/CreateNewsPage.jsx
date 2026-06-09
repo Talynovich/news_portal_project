@@ -4,6 +4,7 @@ import {
   useUploadImageMutation,
   useCreateNewsMutation,
 } from '../../store/news/newsApi.js'
+import { useNavigate } from 'react-router'
 
 const CreateNewsPage = () => {
   const [uploadImage, { isLoading: isUploadingImage, error: uploadError }] =
@@ -12,6 +13,7 @@ const CreateNewsPage = () => {
     useCreateNewsMutation()
   const [imagePreview, setImagePreview] = useState(null)
   const [successMessage, setSuccessMessage] = useState(null)
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -37,10 +39,15 @@ const CreateNewsPage = () => {
   const onSubmit = async (data) => {
     setSuccessMessage(null)
     try {
-      await createNews(data).unwrap()
+      const newsData = {
+        ...data,
+        imageUrl: data.imageUrl === '' ? null : data.imageUrl,
+      }
+      await createNews(newsData).unwrap()
       setSuccessMessage('Новость успешно опубликована!')
       setImagePreview(null)
       reset()
+      navigate('/')
     } catch (err) {
       console.error('Ошибка создания новости:', err)
     }

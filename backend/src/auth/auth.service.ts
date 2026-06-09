@@ -46,6 +46,7 @@ export class AuthService {
         },
       ),
       username: user.username,
+      role: user.role,
     };
   }
 
@@ -64,6 +65,7 @@ export class AuthService {
             sub: user.id,
             username: user.username,
             role: user.role,
+            email: user.email,
           },
           {
             expiresIn: '15m',
@@ -74,12 +76,14 @@ export class AuthService {
             sub: user.id,
             username: user.username,
             role: user.role,
+            email: user.email,
           },
           {
             expiresIn: '3d',
           },
         ),
         username: user.username,
+        role: user.role,
       };
     } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');

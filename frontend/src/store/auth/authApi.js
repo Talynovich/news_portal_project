@@ -6,29 +6,28 @@ import { logout, setCredentials } from './authSlice'
 const baseQuery = fetchBaseQuery({
   baseUrl: `${authurl}`,
   prepareHeaders: (headers, { getState }) => {
-    const token = getState().auth.accessToken
+    const token = getState().auth.access_token
     if (token) {
       try {
         headers.set('authorization', `Bearer ${token}`)
       } catch (e) {
-        console.log(`Критическая ошибка в токене авторизации: ${e}`)
+        console.log(`Critical error in authorization token: ${e}`)
       }
     }
     return headers
   },
 })
 
-const baseQueryWithReauth = async (args, api, extraOptions) => {
+export const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions)
-
   if (result.error && result.error.status === 401) {
-    const refreshToken = api.getState().auth.refreshToken
+    const refresh_token = api.getState().auth.refresh_token
 
     const refreshResult = await baseQuery(
       {
-        url: 'refresh',
+        url: '/refresh',
         method: 'POST',
-        body: { refreshToken },
+        body: { refresh_token: refresh_token },
       },
       api,
       extraOptions
