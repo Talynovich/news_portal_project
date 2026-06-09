@@ -1,4 +1,5 @@
 import {
+  AfterLoad,
   Column,
   CreateDateColumn,
   Entity,
@@ -24,13 +25,13 @@ export class News {
   description: string;
 
   @Column({ nullable: true })
-  imageUrl: number;
+  imageUrl: number | string;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @OneToOne(() => Image, { nullable: true, onDelete: 'SET NULL', eager: true })
-  @JoinColumn({ name: 'imageId' })
+  @JoinColumn({ name: 'imageUrl' })
   image: Image;
 
   @ManyToOne(() => Users, (user) => user.news, { onDelete: 'SET NULL' })
@@ -38,4 +39,11 @@ export class News {
 
   @OneToMany(() => Comment, (comments) => comments.news)
   comments: Comment[];
+
+  @AfterLoad()
+  convertIdToUrl() {
+    if (this.image && this.image.url) {
+      this.imageUrl = `${this.image.url}`;
+    }
+  }
 }
