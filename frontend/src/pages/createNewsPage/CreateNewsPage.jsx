@@ -28,7 +28,7 @@ const CreateNewsPage = () => {
     setSuccessMessage(null)
     try {
       const response = await uploadImage(file).unwrap()
-      setValue('imageId', response.id, { shouldValidate: true })
+      setValue('imageUrl', response.id, { shouldValidate: true })
     } catch (err) {
       console.error('Ошибка загрузки картинки:', err)
       setImagePreview(null)
@@ -113,7 +113,7 @@ const CreateNewsPage = () => {
               Обложка новости
             </label>
 
-            <input type="hidden" {...register('imageId')} />
+            <input type="hidden" {...register('imageUrl')} />
 
             <div className="mt-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-lg p-4 bg-slate-50 hover:bg-slate-100 transition-colors relative">
               {imagePreview ? (
