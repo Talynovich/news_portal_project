@@ -6,6 +6,13 @@ export const newsApi = createApi({
   reducerPath: 'newsApi',
   baseQuery: fetchBaseQuery({
     baseUrl: `${baseurl}`,
+    prepareHeaders: (headers, { getState }) => {
+      const token = getState().auth.access_token
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`)
+      }
+      return headers
+    },
   }),
   tagTypes: ['News'],
   endpoints: (build) => ({
