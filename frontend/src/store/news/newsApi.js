@@ -25,7 +25,30 @@ export const newsApi = createApi({
       query: (id) => ({ url: `/${id}`, method: 'DELETE' }),
       invalidatesTags: ['News'],
     }),
+    uploadImage: build.mutation({
+      query: (file) => {
+        const formData = new FormData()
+        formData.append('file', file)
+        return {
+          url: '/upload',
+          method: 'POST',
+          body: formData,
+        }
+      },
+    }),
+    createNews: build.mutation({
+      query: (newsData) => ({
+        url: '/news',
+        method: 'POST',
+        body: newsData,
+      }),
+    }),
   }),
 })
 
-export const { useGetNewsQuery, useGetDetailNewsQuery } = newsApi
+export const {
+  useGetNewsQuery,
+  useGetDetailNewsQuery,
+  useCreateNewsMutation,
+  useUploadImageMutation,
+} = newsApi

@@ -5,12 +5,12 @@ import HomePage from './pages/homePage/HomePage'
 import LoginPage from './pages/loginPage/LoginPage'
 import DetailNewPage from './pages/detailNewPage'
 
-import News from './pages/news'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { Provider } from 'react-redux'
 import { store } from './store/index'
 import RegisterPage from './pages/registerPage'
 import AdminPage from './pages/adminPage'
+import CreateNewsPage from './pages/createNewsPage'
 
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
@@ -19,7 +19,7 @@ createRoot(document.getElementById('root')).render(
         <Route element={<App />} path={'/'}>
           <Route index element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/news" element={<News />} />
+          <Route path="/create-news" element={<CreateNewsPage />} />
           <Route path="/news/:id" element={<DetailNewPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/admin" element={<AdminPage />} />
