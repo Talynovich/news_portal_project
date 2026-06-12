@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router'
+import { Image } from 'antd'
 
 const NewsCard = ({ id, title, description, imageUrl, createdAt, author }) => {
   const formattedDate = new Date(createdAt).toLocaleDateString('ru-RU')
@@ -7,11 +8,7 @@ const NewsCard = ({ id, title, description, imageUrl, createdAt, author }) => {
     <article className="flex flex-col md:flex-row bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
       <div className="md:w-64 h-48 md:h-full min-h-[180px] bg-gray-100 relative flex-shrink-0">
         {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
+          <Image width={300} alt={title} src={imageUrl} />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 p-4 text-center">
             <svg

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Input, Table, Tag, Button } from 'antd'
+import { Input, Table, Tag, Button, Popconfirm } from 'antd'
 import { SearchOutlined, DeleteOutlined } from '@ant-design/icons'
 import {
   useGetAllUsersQuery,
@@ -27,10 +27,6 @@ const AdminPage = () => {
       title: 'Пользователь',
       dataIndex: 'username',
       key: 'username',
-      sorter: (a, b) => a.username.localeCompare(b.username),
-      render: (text) => (
-        <span className="font-medium text-slate-900">@{text}</span>
-      ),
     },
     {
       title: 'Email',
@@ -61,16 +57,21 @@ const AdminPage = () => {
       key: 'action',
       align: 'right',
       render: (_, record) => (
-        <Button
-          type="text"
-          danger
-          disabled={record.role === 'admin'} // Нельзя удалить админа
-          icon={<DeleteOutlined />}
-          onClick={() => handleDelete(record)}
-          className="hover:bg-rose-50 rounded-lg transition-colors"
+        <Popconfirm
+          title="Удаление пользователя"
+          description="Вы уверены, что удалите этого пользователя?"
+          onConfirm={() => handleDelete(record)}
         >
-          Удалить
-        </Button>
+          <Button
+            type="text"
+            danger
+            disabled={record.role === 'admin'}
+            icon={<DeleteOutlined />}
+            className="hover:bg-rose-50 rounded-lg transition-colors"
+          >
+            Удалить
+          </Button>
+        </Popconfirm>
       ),
     },
   ]
