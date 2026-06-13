@@ -25,7 +25,7 @@ const Header = () => {
               {role === 'admin' && (
                 <Link
                   to="/admin"
-                  className=" hover:bg-blue-800 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-sm shadow-emerald-100"
+                  className=" bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-sm shadow-emerald-100"
                 >
                   Пользователи
                 </Link>

@@ -1,13 +1,14 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Input, Table, Tag, Button, Popconfirm } from 'antd'
 import { SearchOutlined, DeleteOutlined } from '@ant-design/icons'
 import {
   useGetAllUsersQuery,
   useDeleteUserMutation,
 } from '../../store/users/usersApi'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 const AdminPage = () => {
+  const { role } = useSelector((store) => store.auth)
   const [searchText, setSearchText] = useState('')
   const [deleteUser] = useDeleteUserMutation()
   const { data: users = [], isLoading } = useGetAllUsersQuery()
@@ -75,6 +76,8 @@ const AdminPage = () => {
       ),
     },
   ]
+
+  if (role == 'user') return navigate('/')
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 text-[#1E293B]">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">

@@ -1,14 +1,31 @@
 import React from 'react'
 import { Link } from 'react-router'
-import { Image } from 'antd'
-
-const NewsCard = ({ id, title, description, imageUrl, createdAt, author }) => {
+import { Button, Image, Popconfirm } from 'antd'
+import { useDeleteNewsMutation } from '../store/news/newsApi.js'
+import { QuestionCircleOutlined } from '@ant-design/icons'
+const NewsCard = ({
+  id,
+  title,
+  description,
+  imageUrl,
+  createdAt,
+  author,
+  authorId,
+}) => {
   const formattedDate = new Date(createdAt).toLocaleDateString('ru-RU')
+  const [deleteNews] = useDeleteNewsMutation()
+  const handleDelete = async (newsId) => {
+    try {
+      await deleteNews(newsId).unwrap()
+    } catch (err) {
+      console.log(`Error: ${err}`)
+    }
+  }
   return (
     <article className="flex flex-col md:flex-row bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
       <div className="md:w-64 h-48 md:h-full min-h-[180px] bg-gray-100 relative flex-shrink-0">
         {imageUrl ? (
-          <Image width={300} alt={title} src={imageUrl} />
+          <Image alt={title} src={imageUrl} />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 p-4 text-center">
             <svg
@@ -41,7 +58,23 @@ const NewsCard = ({ id, title, description, imageUrl, createdAt, author }) => {
           </p>
         </div>
         <div className="flex items-center justify-between pt-3 border-t border-gray-100 text-sm">
-          <div className="flex items-center space-x-1.5 text-gray-500"></div>
+          <div className="flex items-center space-x-1.5 text-gray-500">
+            {authorId && (
+              <Popconfirm
+                title="Удаление новости"
+                description="Вы уверены что удалить удалить новость?"
+                okText="Да"
+                cancelText="Нет"
+                icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+                onConfirm={() => handleDelete(id)}
+              >
+                <Button color="danger" variant="solid">
+                  Удалить
+                </Button>
+              </Popconfirm>
+            )}
+          </div>
+
           <Link
             to={`/news/${id}`}
             className="text-blue-600 hover:text-blue-700 font-semibold text-xs uppercase tracking-wider flex items-center space-x-1 transition-colors"

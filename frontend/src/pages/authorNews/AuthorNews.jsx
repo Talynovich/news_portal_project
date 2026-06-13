@@ -1,37 +1,39 @@
-import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useState } from 'react'
 import { useGetNewsQuery } from '../../store/news/newsApi.js'
-import { setCredentialsNews } from '../../store/news/newsSlice.js'
+import { jwtDecode } from 'jwt-decode'
 import NewsList from '../../component/newsList/index.js'
+import { useSelector } from 'react-redux'
 
-const HomePage = () => {
-  const dispatch = useDispatch()
+const AuthorNews = () => {
   const [correntPage, setCorrentPage] = useState(1)
   const handlePageChange = (e) => {
     setCorrentPage(e)
   }
+  let authorId = null
+  const token = useSelector((store) => store.auth.access_token)
+
+  if (token) {
+    const decoded = jwtDecode(token)
+    authorId = decoded.sub
+  }
   const { data, isLoading } = useGetNewsQuery({
     correntPage,
     limit: 5,
+    authorId,
   })
 
-  useEffect(() => {
-    if (data) {
-      dispatch(setCredentialsNews(data.data))
-    }
-  }, [data, dispatch])
-
   return (
-    <main className="max-w-4xl mx-auto px-4 py-10">
+    <div className="max-w-4xl mx-auto px-4 py-10">
       <NewsList
         data={data}
         isLoading={isLoading}
         correntPage={correntPage}
         handlePageChange={handlePageChange}
-        title={'Лента новостей'}
+        title={'Мои новости'}
+        authorId={authorId}
       />
-    </main>
+    </div>
   )
 }
 
-export default HomePage
+export default AuthorNews

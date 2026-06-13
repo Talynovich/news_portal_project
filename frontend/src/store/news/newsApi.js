@@ -17,10 +17,10 @@ export const newsApi = createApi({
   tagTypes: ['News'],
   endpoints: (build) => ({
     getNews: build.query({
-      query: ({ correntPage, limit = 5 }) => ({
+      query: ({ correntPage, limit = 5, authorId }) => ({
         url: '/news',
         method: 'GET',
-        params: { page: correntPage, limit },
+        params: { page: correntPage, limit, authorId },
       }),
       providesTags: ['News'],
     }),
@@ -29,7 +29,7 @@ export const newsApi = createApi({
       providesTags: ['News'],
     }),
     deleteNews: build.mutation({
-      query: (id) => ({ url: `/${id}`, method: 'DELETE' }),
+      query: (id) => ({ url: `/news/${id}`, method: 'DELETE' }),
       invalidatesTags: ['News'],
     }),
     uploadImage: build.mutation({
@@ -58,4 +58,5 @@ export const {
   useGetDetailNewsQuery,
   useCreateNewsMutation,
   useUploadImageMutation,
+  useDeleteNewsMutation,
 } = newsApi
