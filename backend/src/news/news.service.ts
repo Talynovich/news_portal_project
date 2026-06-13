@@ -9,7 +9,13 @@ import { UpdateNewsDto } from './dto/update-news.dto';
 import { News } from './entities/news.entity';
 import { Image } from '../upload/entities/image.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, In, Repository, DataSource } from 'typeorm';
+import {
+  FindManyOptions,
+  In,
+  Repository,
+  DataSource,
+  FindOptionsWhere,
+} from 'typeorm';
 import { SearchService } from '../search/search.service';
 
 @Injectable()
@@ -63,6 +69,7 @@ export class NewsService {
     page: number = 1,
     limit: number = 10,
     search?: string,
+    authorId?: number,
   ): Promise<{ data: News[]; total: number }> {
     if (page <= 0) {
       throw new BadRequestException(
@@ -92,7 +99,9 @@ export class NewsService {
 
       return { data, total };
     }
+
     const options: FindManyOptions<News> = {
+      where: {},
       relations: ['author'],
       order: {
         createdAt: 'DESC',
@@ -100,6 +109,9 @@ export class NewsService {
       take: limit,
       skip: (page - 1) * limit,
     };
+    if (authorId) {
+      options.where = { authorId };
+    }
 
     const [data, total] = await this.newsRepository.findAndCount(options);
     return { data, total };

@@ -27,6 +27,9 @@ export class News {
   description: string;
 
   @Column({ nullable: true })
+  authorId: number | null;
+
+  @Column({ nullable: true })
   imageUrl: string | null;
 
   @CreateDateColumn()
@@ -37,6 +40,7 @@ export class News {
   image: Image | null;
 
   @ManyToOne(() => Users, (user) => user.news, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'authorId' })
   author: Users;
 
   @OneToMany(() => Comment, (comments) => comments.news)

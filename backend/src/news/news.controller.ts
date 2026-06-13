@@ -30,13 +30,15 @@ export class NewsController {
   }
 
   @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'authorId', required: false, type: Number })
   @Get()
   findAll(
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
     @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
     @Query('search') search?: string,
+    @Query('authorId') authorId?: number,
   ) {
-    return this.newsService.findAll(page, limit, search);
+    return this.newsService.findAll(page, limit, search, authorId);
   }
 
   @Get(':id')
