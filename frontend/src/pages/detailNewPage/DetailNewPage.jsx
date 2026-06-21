@@ -1,11 +1,13 @@
-import React from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { useGetDetailNewsQuery } from '../../store/news/newsApi.js'
 import Loader from '../../component/loader/index.js'
+import CommentComponent from '../../component/commentComponent/index.js'
+import { useSelector } from 'react-redux'
 
 const DetailNewPage = () => {
   const { id } = useParams()
   const { data, isLoading } = useGetDetailNewsQuery(id)
+  const { isAuthenticated } = useSelector((store) => store.auth)
   const navigate = useNavigate()
   const formattedDate = new Date(data?.createdAt).toLocaleDateString('ru-RU')
   if (isLoading) return <Loader />
@@ -46,6 +48,11 @@ const DetailNewPage = () => {
       <div className="prose prose-lg dark:prose-invert max-w-none whitespace-pre-line">
         {data.description}
       </div>
+      <CommentComponent
+        comments={data?.comments}
+        isLoading={isLoading}
+        isAuthenticated={isAuthenticated}
+      />
     </article>
   )
 }

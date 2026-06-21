@@ -49,6 +49,15 @@ export const newsApi = createApi({
         method: 'POST',
         body: newsData,
       }),
+      invalidatesTags: ['News'],
+    }),
+    addCommentsNews: build.mutation({
+      query: (newsData) => ({
+        url: `/comments/news/${newsData.newsId}`,
+        method: 'POST',
+        body: { text: newsData.text },
+      }),
+      invalidatesTags: ['News'],
     }),
   }),
 })
@@ -59,4 +68,5 @@ export const {
   useCreateNewsMutation,
   useUploadImageMutation,
   useDeleteNewsMutation,
+  useAddCommentsNewsMutation,
 } = newsApi
